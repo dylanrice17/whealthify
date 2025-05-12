@@ -1,65 +1,63 @@
-import React from 'react';
-import { Box, Typography, Grid, Card, CardContent } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 
-const cardStyles = [
+const sidebarItems = [
   {
-    background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)',
-    icon: <AssignmentIcon sx={{ fontSize: 48, mb: 1 }} />,
-    title: 'Begin Health Assessment',
-    desc: 'Start a new health assessment to generate your letter.'
+    label: 'Profile',
+    icon: <AccountCircleIcon sx={{ color: '#43e97b' }} />,
   },
   {
-    background: 'linear-gradient(135deg, #43e97b 60%, #2196f3 100%)',
-    icon: <TableChartIcon sx={{ fontSize: 48, mb: 1 }} />,
-    title: 'My Health Assessments',
-    desc: 'View your completed health assessments.'
+    label: 'My Health Assessments',
+    icon: <TableChartIcon sx={{ color: '#2196f3' }} />,
   },
   {
-    background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)',
-    icon: <DescriptionIcon sx={{ fontSize: 48, mb: 1 }} />,
-    title: 'My Letters of Medical Necessity',
-    desc: 'Access your generated letters for HSA/FSA use.'
-  }
+    label: 'My Letters of Medical Necessity',
+    icon: <DescriptionIcon sx={{ color: '#43e97b' }} />,
+  },
 ];
 
 export default function Dashboard() {
+  const [firstName, setFirstName] = useState('');
+
+  useEffect(() => {
+    const lastUser = JSON.parse(localStorage.getItem('whealthify_last_user') || 'null');
+    if (lastUser && lastUser.name) {
+      setFirstName(lastUser.name.split(' ')[0]);
+    }
+  }, []);
+
   return (
-    <Box sx={{ minHeight: '100vh', background: 'radial-gradient(circle at 50% 0%, #1e293b 60%, #0f172a 100%)', py: 8 }}>
-      <Typography variant="h2" fontWeight={700} align="center" sx={{ color: '#fff', mb: 6, textShadow: '0 4px 24px #2196f3' }}>
-        Dashboard
-      </Typography>
-      <Grid container spacing={4} justifyContent="center">
-        <Grid item xs={12} md={5} lg={4}>
-          <Card sx={{ backgroundImage: cardStyles[0].background, borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', color: '#fff', p: 2, cursor: 'pointer', textAlign: 'center' }}>
-            <CardContent>
-              {cardStyles[0].icon}
-              <Typography variant="h5" fontWeight={700} gutterBottom>{cardStyles[0].title}</Typography>
-              <Typography variant="body1">{cardStyles[0].desc}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={5} lg={4}>
-          <Card sx={{ backgroundImage: cardStyles[1].background, borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', color: '#fff', p: 2, cursor: 'pointer', textAlign: 'center' }}>
-            <CardContent>
-              {cardStyles[1].icon}
-              <Typography variant="h5" fontWeight={700} gutterBottom>{cardStyles[1].title}</Typography>
-              <Typography variant="body1">{cardStyles[1].desc}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={10} lg={8} sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Card sx={{ backgroundImage: cardStyles[2].background, borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', color: '#fff', p: 2, cursor: 'pointer', textAlign: 'center', minWidth: 350, maxWidth: 500 }}>
-            <CardContent>
-              {cardStyles[2].icon}
-              <Typography variant="h5" fontWeight={700} gutterBottom>{cardStyles[2].title}</Typography>
-              <Typography variant="body1">{cardStyles[2].desc}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'radial-gradient(circle at 50% 0%, #1e293b 60%, #0f172a 100%)' }}>
+      {/* Sidebar */}
+      <Box sx={{ width: 250, background: 'rgba(16, 24, 40, 0.98)', color: '#fff', py: 4, px: 2, display: 'flex', flexDirection: 'column', minHeight: '100vh', boxShadow: '2px 0 16px 0 rgba(33,150,243,0.10)' }}>
+        <Typography variant="h5" fontWeight={700} sx={{ mb: 4, textAlign: 'center', letterSpacing: 1, color: '#43e97b' }}>
+          Dashboard
+        </Typography>
+        <Divider sx={{ mb: 2, background: 'rgba(255,255,255,0.08)' }} />
+        <List>
+          {sidebarItems.map((item, idx) => (
+            <ListItem button key={item.label} sx={{ borderRadius: 2, mb: 1, '&:hover': { background: 'rgba(67,233,123,0.08)' } }}>
+              <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 600, color: '#fff' }} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+      {/* Main Content */}
+      <Box sx={{ flex: 1, p: { xs: 2, md: 6 }, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <Typography variant="h3" fontWeight={700} sx={{ color: '#fff', mb: 4, mt: 2, textShadow: '0 4px 24px #2196f3' }}>
+          {firstName ? `Welcome to Whealthify, ${firstName}!` : 'Welcome to Whealthify!'}
+        </Typography>
+        {/* Placeholder for dashboard widgets or info */}
+        <Box sx={{ width: '100%', maxWidth: 800, mt: 4, p: 4, borderRadius: 4, background: 'rgba(33,150,243,0.10)', color: '#fff', textAlign: 'center' }}>
+          <Typography variant="h6" fontWeight={500}>
+            Select an option from the sidebar to get started.
+          </Typography>
+        </Box>
+      </Box>
     </Box>
   );
 } 

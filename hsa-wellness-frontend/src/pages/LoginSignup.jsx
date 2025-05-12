@@ -37,6 +37,8 @@ export default function LoginSignup() {
     if (user) {
       setLoggedInUser(user);
       setSuccess(`Welcome, ${user.name}!`);
+      localStorage.setItem('whealthify_last_user', JSON.stringify(user));
+      window.dispatchEvent(new Event('whealthify-auth'));
     } else {
       setError('Invalid email or password.');
     }
