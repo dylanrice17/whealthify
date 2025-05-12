@@ -6,7 +6,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
-import jsPDF from 'jspdf';
 
 const sidebarItems = [
   {
@@ -222,29 +221,6 @@ function HealthAssessment({ user }) {
     navigate('/payment');
   };
 
-  const handleDownloadPDF = (assessment, idx) => {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text('Health Assessment Summary', 14, 20);
-    doc.setFontSize(12);
-    doc.text(`Assessment #${idx + 1}`, 14, 32);
-    doc.text(`Date: ${new Date(assessment.date).toLocaleString()}`, 14, 40);
-    doc.text(`BMI: ${assessment.bmi}`, 14, 48);
-    doc.text(`Qualifying Conditions: ${assessment.qualifying && assessment.qualifying.length > 0 ? assessment.qualifying.join(', ') : 'None'}`, 14, 56);
-    doc.text('Answers:', 14, 66);
-    let y = 74;
-    Object.entries(assessment.form).forEach(([key, value]) => {
-      let val = Array.isArray(value) ? value.join(', ') : value;
-      doc.text(`${key}: ${val}`, 16, y);
-      y += 8;
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-    });
-    doc.save(`health_assessment_${idx + 1}.pdf`);
-  };
-
   if (result) {
     return (
       <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', p: 4, color: '#fff', textAlign: 'center' }}>
@@ -286,7 +262,7 @@ function HealthAssessment({ user }) {
                     <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>BMI: {a.bmi}</Typography>
                     <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>Qualifying: {a.qualifying && a.qualifying.length > 0 ? a.qualifying.join(', ') : 'None'}</Typography>
                   </Box>
-                  <Button variant="outlined" sx={{ color: '#43e97b', borderColor: '#43e97b', fontWeight: 700 }} onClick={() => handleDownloadPDF(a, i)}>Download PDF</Button>
+                  <Button variant="outlined" sx={{ color: '#43e97b', borderColor: '#43e97b', fontWeight: 700 }} disabled>Download PDF</Button>
                 </Box>
               ))}
             </Box>
