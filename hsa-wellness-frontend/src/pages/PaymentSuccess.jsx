@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // On mount, move latest assessment to user's completedAssessments
+    const assessment = JSON.parse(localStorage.getItem('whealthify_latest_assessment') || 'null');
+    if (!assessment) return;
+    const lastUser = JSON.parse(localStorage.getItem('whealthify_last_user') || 'null');
+    if (!lastUser) return;
+    const users = JSON.parse(localStorage.getItem('whealthify_users') || '[]');
+    const idx = users.findIndex(u => u.email === lastUser.email);
+    if (idx !== -1) {
+      const user = users[idx];
+      user.completedAssessments = user.completedAssessments || [];
+      user.completedAssessments.push(assessment);
+      users[idx] = user;
+      localStorage.setItem('whealthify_users', JSON.stringify(users));
+      localStorage.setItem('whealthify_last_user', JSON.stringify(user));
+    }
+    localStorage.removeItem('whealthify_latest_assessment');
+  }, []);
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 50% 0%, #1e293b 60%, #0f172a 100%)' }}>
       <Box sx={{ width: 500, bgcolor: '#181c1f', borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(0,0,0,0.45)', p: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
