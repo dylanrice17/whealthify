@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Box, Button, Typography, Card, CardContent, Avatar, Divider, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -17,40 +18,51 @@ const gradientBox = {
   textAlign: 'center',
 };
 
-function ParallaxStepCard({ icon, title, description, gradient, delay = 0 }) {
+function ParallaxStepCard({ icon, title, description, gradient }) {
   const ref = useRef();
-  const [inView, setInView] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    const observer = new window.IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setInView(true), delay);
-        } else {
-          setInView(false);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [delay]);
+    function handleScroll() {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const cardCenter = rect.top + rect.height / 2;
+      const windowCenter = windowHeight / 2;
+      const distance = Math.abs(cardCenter - windowCenter);
+      const maxDistance = windowHeight / 2 + rect.height / 2;
+      // Scale: 1.12 at center, 1 at farthest
+      const newScale = 1 + 0.12 * (1 - Math.min(distance / maxDistance, 1));
+      setScale(newScale);
+    }
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
 
   return (
     <Card
       ref={ref}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       sx={{
         background: gradient,
         borderRadius: '24px',
-        boxShadow: inView
-          ? '0 8px 40px 0 rgba(33,150,243,0.25)'
-          : '0 4px 32px 0 rgba(33,150,243,0.15)',
+        boxShadow: hovered
+          ? '0 0 32px 8px rgba(67,233,123,0.25), 0 8px 40px 0 rgba(33,150,243,0.18)'
+          : '0 8px 40px 0 rgba(33,150,243,0.18)',
         color: '#fff',
         mb: 4,
         maxWidth: 700,
         mx: 'auto',
-        transform: inView ? 'scale(1.04) translateY(-12px)' : 'scale(1) translateY(0)',
-        transition: 'transform 0.5s cubic-bezier(.23,1.01,.32,1), box-shadow 0.5s',
+        transform: `scale(${scale})`,
+        transition: 'transform 0.35s cubic-bezier(.23,1.01,.32,1), box-shadow 0.4s',
+        cursor: 'pointer',
       }}
     >
       <CardContent>
@@ -84,6 +96,7 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
   return (
     <Box sx={{ minHeight: '100vh', background: 'radial-gradient(circle at 50% 0%, #1e293b 60%, #0f172a 100%)', py: 8 }}>
       <Box sx={gradientBox}>
@@ -93,7 +106,7 @@ export default function Home() {
         <Typography variant="h6" sx={{ mb: 3 }}>
           Unlock your health potential and save money. Use your HSA/FSA funds to pay for your gym membership with a doctor-approved medical necessity letter.
         </Typography>
-        <Button variant="contained" size="large" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)', color: '#fff', fontWeight: 700 }}>
+        <Button variant="contained" size="large" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)', color: '#fff', fontWeight: 700 }} onClick={() => navigate('/login')}>
           Get Started
         </Button>
       </Box>
@@ -110,14 +123,12 @@ export default function Home() {
           title="Step 2: Doctor Letter"
           description="Instantly generate a medical necessity letter for your gym membership."
           gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
-          delay={100}
         />
         <ParallaxStepCard
           icon={<CreditCardIcon fontSize="inherit" />}
           title="Step 3: Use HSA/FSA"
           description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
           gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
-          delay={200}
         />
       </Box>
 

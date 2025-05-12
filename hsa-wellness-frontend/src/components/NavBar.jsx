@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const menuItems = [
   { label: 'Home', path: '/' },
@@ -10,6 +11,7 @@ const menuItems = [
 ];
 
 export default function NavBar() {
+  const navigate = useNavigate();
   return (
     <AppBar position="static" sx={{ background: 'rgba(16, 24, 40, 0.95)', boxShadow: 'none', mb: 4 }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -24,7 +26,7 @@ export default function NavBar() {
           ))}
         </Box>
         <Box>
-          <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }}>Login</Button>
+          <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }} onClick={() => navigate('/login')}>Login</Button>
           <Button color="inherit" sx={{ fontWeight: 600, border: '1px solid #fff', borderRadius: 2 }}>Enterprise Login</Button>
         </Box>
       </Toolbar>
