@@ -38,6 +38,11 @@ export default function NavBar() {
     navigate('/');
   };
 
+  // DEV ONLY: Clear localStorage on first load to ensure no user is logged in
+  if (process.env.NODE_ENV === 'development') {
+    localStorage.removeItem('whealthify_last_user');
+  }
+
   return (
     <AppBar position="static" sx={{ background: 'rgba(16, 24, 40, 0.95)', boxShadow: 'none', mb: 4 }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
