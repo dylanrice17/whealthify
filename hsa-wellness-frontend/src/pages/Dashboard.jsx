@@ -5,6 +5,7 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useNavigate } from 'react-router-dom';
 
 const sidebarItems = [
   {
@@ -54,7 +55,7 @@ function ProfileForm({ user }) {
     gender: user?.gender || '',
   });
   const [success, setSuccess] = useState('');
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     setForm(f => ({ ...f, name: user?.name || '', email: user?.email || '' }));
@@ -141,6 +142,7 @@ function HealthAssessment({ user }) {
     interest: '',
   });
   const [result, setResult] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setForm(prev => ({
@@ -199,10 +201,8 @@ function HealthAssessment({ user }) {
     if (form.diagnoses.includes('Hypertension') || form.symptoms.includes('High blood pressure')) qualifying.push('Hypertension');
     if (form.diagnoses.includes('Depression') || form.symptoms.includes('Low mood')) qualifying.push('Depression');
     if (form.diagnoses.includes('Anxiety')) qualifying.push('Anxiety');
-    setResult({
-      bmi: bmi.toFixed(1),
-      qualifying: Array.from(new Set(qualifying)),
-    });
+    // Instead of showing result, navigate to payment
+    navigate('/payment');
   };
 
   if (result) {

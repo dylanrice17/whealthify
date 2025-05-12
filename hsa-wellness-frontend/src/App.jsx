@@ -5,6 +5,7 @@ import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import LoginSignup from './pages/LoginSignup';
 import Dashboard from './pages/Dashboard';
+import Payment from './pages/Payment';
 
 const theme = createTheme({
   palette: {
@@ -29,6 +30,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginSignup />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/payment" element={<Payment />} />
     </Routes>
   );
 }
