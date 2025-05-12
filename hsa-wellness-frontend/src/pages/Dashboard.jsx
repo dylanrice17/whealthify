@@ -6,6 +6,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
 
 const sidebarItems = [
   {
@@ -143,6 +144,7 @@ function HealthAssessment({ user }) {
     interest: '',
   });
   const [result, setResult] = useState(null);
+  const [completed, setCompleted] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,6 +154,12 @@ function HealthAssessment({ user }) {
       heightInches: user?.heightInches || '',
       weight: user?.weight || '',
     }));
+    // Load completed assessments from user
+    if (user && user.completedAssessments) {
+      setCompleted(user.completedAssessments);
+    } else {
+      setCompleted([]);
+    }
   }, [user]);
 
   const diagnosisOptions = [
@@ -202,8 +210,39 @@ function HealthAssessment({ user }) {
     if (form.diagnoses.includes('Hypertension') || form.symptoms.includes('High blood pressure')) qualifying.push('Hypertension');
     if (form.diagnoses.includes('Depression') || form.symptoms.includes('Low mood')) qualifying.push('Depression');
     if (form.diagnoses.includes('Anxiety')) qualifying.push('Anxiety');
+    // Save latest assessment to localStorage
+    const assessment = {
+      date: new Date().toISOString(),
+      bmi: bmi.toFixed(1),
+      qualifying,
+      form: { ...form },
+    };
+    localStorage.setItem('whealthify_latest_assessment', JSON.stringify(assessment));
     // Instead of showing result, navigate to payment
     navigate('/payment');
+  };
+
+  const handleDownloadPDF = (assessment, idx) => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Health Assessment Summary', 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Assessment #${idx + 1}`, 14, 32);
+    doc.text(`Date: ${new Date(assessment.date).toLocaleString()}`, 14, 40);
+    doc.text(`BMI: ${assessment.bmi}`, 14, 48);
+    doc.text(`Qualifying Conditions: ${assessment.qualifying && assessment.qualifying.length > 0 ? assessment.qualifying.join(', ') : 'None'}`, 14, 56);
+    doc.text('Answers:', 14, 66);
+    let y = 74;
+    Object.entries(assessment.form).forEach(([key, value]) => {
+      let val = Array.isArray(value) ? value.join(', ') : value;
+      doc.text(`${key}: ${val}`, 16, y);
+      y += 8;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+    doc.save(`health_assessment_${idx + 1}.pdf`);
   };
 
   if (result) {
@@ -232,10 +271,26 @@ function HealthAssessment({ user }) {
           <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: '#43e97b' }}>
             My Completed Health Assessments
           </Typography>
-          <Typography sx={{ color: '#b0bfcf' }}>
-            No completed assessments yet.<br />
-            Your completed health assessments will appear here as downloadable PDFs after you submit payment.
-          </Typography>
+          {completed.length === 0 ? (
+            <Typography sx={{ color: '#b0bfcf' }}>
+              No completed assessments yet.<br />
+              Your completed health assessments will appear here as downloadable PDFs after you submit payment.
+            </Typography>
+          ) : (
+            <Box>
+              {completed.map((a, i) => (
+                <Box key={i} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(33,150,243,0.10)', borderRadius: 2, p: 2, mb: 1 }}>
+                  <Box>
+                    <Typography sx={{ color: '#fff', fontWeight: 600 }}>Assessment {i + 1}</Typography>
+                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>Date: {new Date(a.date).toLocaleString()}</Typography>
+                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>BMI: {a.bmi}</Typography>
+                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>Qualifying: {a.qualifying && a.qualifying.length > 0 ? a.qualifying.join(', ') : 'None'}</Typography>
+                  </Box>
+                  <Button variant="outlined" sx={{ color: '#43e97b', borderColor: '#43e97b', fontWeight: 700 }} onClick={() => handleDownloadPDF(a, i)}>Download PDF</Button>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
         {!showForm && (
           <Box onClick={() => setShowForm(true)} sx={{ cursor: 'pointer', background: 'linear-gradient(90deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 2px 12px 0 rgba(33,150,243,0.10)', p: 3, color: '#fff', textAlign: 'center', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 0 24px 4px #43e97b' }, fontWeight: 700, fontSize: 20 }}>
