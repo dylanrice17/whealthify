@@ -24,7 +24,7 @@ export default function NavBar() {
           ))}
         </Box>
         <Box>
-          <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }}>Logout</Button>
+          <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }}>Login</Button>
           <Button color="inherit" sx={{ fontWeight: 600, border: '1px solid #fff', borderRadius: 2 }}>Enterprise Login</Button>
         </Box>
       </Toolbar>
