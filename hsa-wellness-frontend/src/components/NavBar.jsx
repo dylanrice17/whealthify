@@ -47,8 +47,28 @@ export default function NavBar() {
     <AppBar position="static" sx={{ background: 'rgba(16, 24, 40, 0.95)', boxShadow: 'none', mb: 4 }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h6" fontWeight={700} sx={{ mr: 3 }}>
-            Whealthify
+          <Typography variant="h6" fontWeight={700} sx={{ mr: 3, display: 'flex', alignItems: 'center' }}>
+            <span style={{ color: '#43e97b' }}>W</span>
+            <span style={{
+              background: 'linear-gradient(90deg, #2196f3 0%, #38f9d7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              display: 'inline-block',
+              fontSize: 'inherit',
+              fontWeight: 'inherit',
+            }}>Health</span>
+            <span style={{
+              background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              display: 'inline-block',
+              fontSize: 'inherit',
+              fontWeight: 'inherit',
+            }}>ify</span>
           </Typography>
           {menuItems.map((item) => (
             <Button key={item.label} color="inherit" sx={{ mx: 0.5, fontWeight: 600 }} href={item.path}>
