@@ -20,7 +20,8 @@ export default function LoginSignup() {
   const [tab, setTab] = useState(0);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [signupName, setSignupName] = useState('');
+  const [signupFirstName, setSignupFirstName] = useState('');
+  const [signupLastName, setSignupLastName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [error, setError] = useState('');
@@ -35,9 +36,9 @@ export default function LoginSignup() {
     const users = getUsers();
     const user = users.find(u => u.email === loginEmail && u.password === loginPassword);
     if (user) {
-      setLoggedInUser(user);
-      setSuccess(`Welcome, ${user.name}!`);
       localStorage.setItem('whealthify_last_user', JSON.stringify(user));
+      setLoggedInUser(user);
+      setSuccess(`Welcome, ${user.firstName} ${user.lastName}!`);
       window.dispatchEvent(new Event('whealthify-auth'));
     } else {
       setError('Invalid email or password.');
@@ -45,20 +46,31 @@ export default function LoginSignup() {
   };
 
   // Handle Sign Up
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError(''); setSuccess('');
-    const users = getUsers();
-    if (users.find(u => u.email === signupEmail)) {
-      setError('An account with this email already exists.');
-      return;
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: signupFirstName,
+          lastName: signupLastName,
+          email: signupEmail,
+          password: signupPassword,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Account created! Please check your email to verify your account.');
+        setTab(0);
+        setSignupFirstName(''); setSignupLastName(''); setSignupEmail(''); setSignupPassword('');
+      } else {
+        setError(data.message || 'Signup failed.');
+      }
+    } catch (err) {
+      setError('Signup failed. Please try again.');
     }
-    const newUser = { name: signupName, email: signupEmail, password: signupPassword };
-    users.push(newUser);
-    setUsers(users);
-    setSuccess('Account created! You can now log in.');
-    setTab(0);
-    setSignupName(''); setSignupEmail(''); setSignupPassword('');
   };
 
   // Redirect to dashboard after login
@@ -81,7 +93,7 @@ export default function LoginSignup() {
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
           {loggedInUser ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="h6" fontWeight={700} sx={{ color: '#fff' }}>Welcome, {loggedInUser.name}!</Typography>
+              <Typography variant="h6" fontWeight={700} sx={{ color: '#fff' }}>Welcome, {loggedInUser.firstName} {loggedInUser.lastName}!</Typography>
               <Typography sx={{ color: '#fff', mt: 1 }}>You are now logged in.</Typography>
             </Box>
           ) : tab === 0 ? (
@@ -94,7 +106,8 @@ export default function LoginSignup() {
           ) : (
             <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }} onSubmit={handleSignup}>
               <Typography variant="h6" fontWeight={700} align="center" sx={{ color: '#fff' }}>Sign Up for Whealthify</Typography>
-              <TextField label="Name" variant="outlined" fullWidth required value={signupName} onChange={e => setSignupName(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
+              <TextField label="First Name" variant="outlined" fullWidth required value={signupFirstName} onChange={e => setSignupFirstName(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
+              <TextField label="Last Name" variant="outlined" fullWidth required value={signupLastName} onChange={e => setSignupLastName(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
               <TextField label="Email" type="email" variant="outlined" fullWidth required value={signupEmail} onChange={e => setSignupEmail(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
               <TextField label="Password" type="password" variant="outlined" fullWidth required value={signupPassword} onChange={e => setSignupPassword(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
               <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} type="submit">Sign Up</Button>

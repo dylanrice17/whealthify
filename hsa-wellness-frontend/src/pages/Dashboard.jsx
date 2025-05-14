@@ -46,7 +46,8 @@ const genderOptions = [
 
 function ProfileForm({ user }) {
   const [form, setForm] = useState({
-    name: user?.name || '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
     email: user?.email || '',
     heightFeet: user?.heightFeet || '',
     heightInches: user?.heightInches || '',
@@ -58,7 +59,17 @@ function ProfileForm({ user }) {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    setForm(f => ({ ...f, name: user?.name || '', email: user?.email || '' }));
+    setForm(f => ({
+      ...f,
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      heightFeet: user?.heightFeet || '',
+      heightInches: user?.heightInches || '',
+      weight: user?.weight || '',
+      dob: user?.dob || '',
+      gender: user?.gender || '',
+    }));
   }, [user]);
 
   const handleChange = e => {
@@ -80,7 +91,8 @@ function ProfileForm({ user }) {
       </Typography>
       {editMode ? (
         <form onSubmit={handleSubmit}>
-          <TextField label="Name" name="name" value={form.name} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
+          <TextField label="First Name" name="firstName" value={form.firstName} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
+          <TextField label="Last Name" name="lastName" value={form.lastName} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
           <TextField label="Email" name="email" value={form.email} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
           <Grid container spacing={2} sx={{ mt: 1, mb: 1 }}>
             <Grid item xs={6}>
@@ -102,8 +114,12 @@ function ProfileForm({ user }) {
         <Box>
           <Button onClick={() => setEditMode(true)} sx={{ position: 'absolute', top: 16, right: 16, color: '#fff', minWidth: 0, p: 1 }}><EditIcon /></Button>
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ color: '#b2f5ea' }}>Name</Typography>
-            <Typography variant="body1" fontWeight={600}>{form.name}</Typography>
+            <Typography variant="subtitle2" sx={{ color: '#b2f5ea' }}>First Name</Typography>
+            <Typography variant="body1" fontWeight={600}>{form.firstName}</Typography>
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ color: '#b2f5ea' }}>Last Name</Typography>
+            <Typography variant="body1" fontWeight={600}>{form.lastName}</Typography>
           </Box>
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle2" sx={{ color: '#b2f5ea' }}>Email</Typography>
@@ -331,8 +347,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     const lastUser = getCurrentUser();
-    if (lastUser && lastUser.name) {
-      setFirstName(lastUser.name.split(' ')[0]);
+    if (lastUser && lastUser.firstName) {
+      setFirstName(lastUser.firstName);
       setUser(lastUser);
     }
   }, []);

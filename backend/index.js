@@ -13,13 +13,17 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 
+app.get('/test', (req, res) => {
+  res.json({ message: 'Backend is working!' });
+});
+
 // Connect to MongoDB
 mongoose.connect(config.mongodbUri)
   .then(() => console.log('MongoDB connected!'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Start server
-const PORT = config.port;
+const PORT = 5050;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
