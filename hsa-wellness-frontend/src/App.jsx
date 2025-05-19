@@ -7,6 +7,8 @@ import LoginSignup from './pages/LoginSignup';
 import Dashboard from './pages/Dashboard';
 import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
+import DoctorLogin from './pages/DoctorLogin';
+import DoctorDashboard from './pages/DoctorDashboard';
 
 const theme = createTheme({
   palette: {
@@ -33,6 +35,8 @@ function AppRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/doctor-login" element={<DoctorLogin />} />
+      <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
     </Routes>
   );
 }

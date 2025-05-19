@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const config = require('./src/config/config');
 const authRoutes = require('./src/routes/authRoutes');
+const doctorAuthRoutes = require('./src/routes/doctorAuthRoutes');
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/doctor', doctorAuthRoutes);
 
 app.get('/test', (req, res) => {
   res.json({ message: 'Backend is working!' });
