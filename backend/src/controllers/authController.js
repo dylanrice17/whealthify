@@ -15,7 +15,7 @@ const generateVerificationToken = () => {
 // Signup controller
 exports.signup = async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, state, heightFeet, heightInches, weight, dob, gender } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -33,6 +33,12 @@ exports.signup = async (req, res) => {
       password,
       firstName,
       lastName,
+      state,
+      heightFeet,
+      heightInches,
+      weight,
+      dob,
+      gender,
       verificationToken,
       verificationTokenExpires
     });
@@ -122,6 +128,7 @@ exports.login = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        state: user.state,
         role: user.role
       }
     });

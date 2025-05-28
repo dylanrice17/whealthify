@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const menuItems = [
   { label: 'Home', path: '/' },
@@ -13,35 +14,12 @@ const menuItems = [
 export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const updateLogin = () => setLoggedIn(!!localStorage.getItem('whealthify_last_user'));
-    updateLogin();
-    window.addEventListener('storage', updateLogin);
-    window.addEventListener('whealthify-auth', updateLogin);
-    return () => {
-      window.removeEventListener('storage', updateLogin);
-      window.removeEventListener('whealthify-auth', updateLogin);
-    };
-  }, []);
-
-  // Also update login state on every route change
-  useEffect(() => {
-    setLoggedIn(!!localStorage.getItem('whealthify_last_user'));
-  }, [location]);
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('whealthify_last_user');
-    setLoggedIn(false);
-    window.dispatchEvent(new Event('whealthify-auth'));
+    logout();
     navigate('/');
   };
-
-  // DEV ONLY: Clear localStorage on first load to ensure no user is logged in
-  if (process.env.NODE_ENV === 'development') {
-    localStorage.removeItem('whealthify_last_user');
-  }
 
   return (
     <AppBar position="static" sx={{ background: 'rgba(16, 24, 40, 0.95)', boxShadow: 'none', mb: 4 }}>
@@ -77,7 +55,7 @@ export default function NavBar() {
           ))}
         </Box>
         <Box>
-          {loggedIn ? (
+          {user ? (
             <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }} onClick={handleLogout}>Logout</Button>
           ) : (
             <Button color="inherit" sx={{ fontWeight: 600, mr: 1 }} onClick={() => navigate('/login')}>Login</Button>

@@ -9,6 +9,7 @@ import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import DoctorLogin from './pages/DoctorLogin';
 import DoctorDashboard from './pages/DoctorDashboard';
+import { AuthProvider } from './components/AuthContext';
 
 const theme = createTheme({
   palette: {
@@ -45,10 +46,12 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <NavBar />
-        <AppRoutes />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <NavBar />
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

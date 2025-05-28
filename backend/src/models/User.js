@@ -23,6 +23,34 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  state: {
+    type: String,
+    required: true,
+    trim: true,
+    uppercase: true,
+    minlength: 2,
+    maxlength: 2
+  },
+  heightFeet: {
+    type: Number,
+    default: null
+  },
+  heightInches: {
+    type: Number,
+    default: null
+  },
+  weight: {
+    type: Number,
+    default: null
+  },
+  dob: {
+    type: String,
+    default: ''
+  },
+  gender: {
+    type: String,
+    default: ''
+  },
   isVerified: {
     type: Boolean,
     default: false

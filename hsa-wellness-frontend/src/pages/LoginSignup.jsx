@@ -1,6 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Tabs, Tab, Typography, TextField, Button, Alert } from '@mui/material';
+import { Box, Card, CardContent, Tabs, Tab, Typography, TextField, Button, Alert, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+const stateOptions = [
+  { value: '', label: 'Select State' },
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' },
+];
 
 const cardGradient = {
   background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)',
@@ -24,24 +78,40 @@ export default function LoginSignup() {
   const [signupLastName, setSignupLastName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [signupState, setSignupState] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loggedInUser, setLoggedInUser] = useState(null);
   const navigate = useNavigate();
 
   // Handle Login
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError(''); setSuccess('');
-    const users = getUsers();
-    const user = users.find(u => u.email === loginEmail && u.password === loginPassword);
-    if (user) {
-      localStorage.setItem('whealthify_last_user', JSON.stringify(user));
-      setLoggedInUser(user);
-      setSuccess(`Welcome, ${user.firstName} ${user.lastName}!`);
-      window.dispatchEvent(new Event('whealthify-auth'));
-    } else {
-      setError('Invalid email or password.');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: loginEmail,
+          password: loginPassword,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const user = {
+          ...data.user,
+          token: data.token
+        };
+        localStorage.setItem('whealthify_last_user', JSON.stringify(user));
+        setLoggedInUser(user);
+        setSuccess(`Welcome, ${user.firstName} ${user.lastName}!`);
+        window.dispatchEvent(new Event('whealthify-auth'));
+      } else {
+        setError(data.message || 'Invalid email or password.');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
     }
   };
 
@@ -58,13 +128,14 @@ export default function LoginSignup() {
           lastName: signupLastName,
           email: signupEmail,
           password: signupPassword,
+          state: signupState,
         }),
       });
       const data = await response.json();
       if (response.ok) {
         setSuccess('Account created! Please check your email to verify your account.');
         setTab(0);
-        setSignupFirstName(''); setSignupLastName(''); setSignupEmail(''); setSignupPassword('');
+        setSignupFirstName(''); setSignupLastName(''); setSignupEmail(''); setSignupPassword(''); setSignupState('');
       } else {
         setError(data.message || 'Signup failed.');
       }
@@ -110,6 +181,9 @@ export default function LoginSignup() {
               <TextField label="Last Name" variant="outlined" fullWidth required value={signupLastName} onChange={e => setSignupLastName(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
               <TextField label="Email" type="email" variant="outlined" fullWidth required value={signupEmail} onChange={e => setSignupEmail(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
               <TextField label="Password" type="password" variant="outlined" fullWidth required value={signupPassword} onChange={e => setSignupPassword(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }} />
+              <TextField select label="State" variant="outlined" fullWidth required value={signupState} onChange={e => setSignupState(e.target.value)} InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' }, '&:hover fieldset': { borderColor: '#43e97b' } } }}>
+                {stateOptions.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+              </TextField>
               <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} type="submit">Sign Up</Button>
             </Box>
           )}
