@@ -11,7 +11,7 @@ export default function Payment() {
           Almost There!
         </Typography>
         <Typography align="center" sx={{ color: '#b0bfcf', mb: 2 }}>
-          Secure your doctor's letter for your gym membership. Just a quick checkout and you'll be able to instantly download your medical necessity letter for HSA/FSA use.
+          After checkout, a doctor will review your health assessment and provide your Letter of Medical Necessity within 24 hours. If the doctor determines you are ineligible, you'll be automatically refunded.
         </Typography>
         <Typography align="center" sx={{ color: '#43e97b', fontWeight: 700, fontSize: 24, mb: 3 }}>
           $50.00

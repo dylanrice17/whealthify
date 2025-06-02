@@ -122,58 +122,30 @@ function ProfileSection() {
   );
 }
 
-function HealthAssessment({ user }) {
-  const [showForm, setShowForm] = useState(false);
+function HealthAssessmentCard() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    heightFeet: user?.heightFeet || '',
-    heightInches: user?.heightInches || '',
-    weight: user?.weight || '',
+    heightFeet: '',
+    heightInches: '',
+    weight: '',
     diagnoses: [],
     symptoms: [],
     exercise: '',
     interest: '',
+    treatment: '',
   });
-  const [result, setResult] = useState(null);
-  const [completed, setCompleted] = useState([]);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setForm(prev => ({
-      ...prev,
-      heightFeet: user?.heightFeet || '',
-      heightInches: user?.heightInches || '',
-      weight: user?.weight || '',
-    }));
-    // Load completed assessments from user
-    if (user && user.completedAssessments) {
-      setCompleted(user.completedAssessments);
-    } else {
-      setCompleted([]);
-    }
-  }, [user]);
-
   const diagnosisOptions = [
-    'Obesity',
-    'Hypertension',
-    'Depression',
-    'Anxiety',
-    'Diabetes',
-    'None',
+    'Obesity', 'Hypertension', 'Depression', 'Anxiety', 'Diabetes', 'None',
   ];
   const symptomOptions = [
-    'Low mood',
-    'Fatigue',
-    'High blood pressure',
-    'Trouble sleeping',
-    'None',
+    'Low mood', 'Fatigue', 'High blood pressure', 'Trouble sleeping', 'None',
   ];
   const exerciseOptions = [
-    '0 days',
-    '1-2 days',
-    '3-4 days',
-    '5+ days',
+    '0 days', '1-2 days', '3-4 days', '5+ days',
   ];
-
+  const treatmentOptions = [
+    'Gym membership', 'Yoga', 'Personal training',
+  ];
   const handleChange = e => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
   };
@@ -187,130 +159,51 @@ function HealthAssessment({ user }) {
       }
     });
   };
-
   const handleSubmit = e => {
     e.preventDefault();
-    // Calculate BMI
-    const h = Number(form.heightFeet) * 12 + Number(form.heightInches);
-    const w = Number(form.weight);
-    const bmi = h > 0 ? (w / (h * h)) * 703 : 0;
-    // Determine possible qualifying conditions
-    const qualifying = [];
-    if (form.diagnoses.includes('Obesity') || bmi >= 30) qualifying.push('Obesity');
-    if (form.diagnoses.includes('Hypertension') || form.symptoms.includes('High blood pressure')) qualifying.push('Hypertension');
-    if (form.diagnoses.includes('Depression') || form.symptoms.includes('Low mood')) qualifying.push('Depression');
-    if (form.diagnoses.includes('Anxiety')) qualifying.push('Anxiety');
-    // Save latest assessment to localStorage
-    const assessment = {
-      date: new Date().toISOString(),
-      bmi: bmi.toFixed(1),
-      qualifying,
-      form: { ...form },
-    };
-    localStorage.setItem('whealthify_latest_assessment', JSON.stringify(assessment));
-    // Instead of showing result, navigate to payment
     navigate('/payment');
   };
-
-  if (result) {
-    return (
-      <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', p: 4, color: '#fff', textAlign: 'center' }}>
-        <CheckCircleIcon sx={{ fontSize: 48, color: '#43e97b', mb: 1 }} />
-        <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>Assessment Complete</Typography>
-        <Typography sx={{ mb: 2 }}>Your calculated BMI: <b>{result.bmi}</b></Typography>
-        {result.qualifying.length > 0 ? (
-          <Typography sx={{ mb: 2 }}>
-            <b>You may qualify for a letter of medical necessity for:</b><br />
-            {result.qualifying.join(', ')}
-          </Typography>
-        ) : (
-          <Typography sx={{ mb: 2 }}>No qualifying conditions detected based on your answers.</Typography>
-        )}
-        <Button variant="contained" sx={{ mt: 2, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} onClick={() => setResult(null)}>Retake Assessment</Button>
-      </Box>
-    );
-  }
-
   return (
-    <Box>
-      <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', mb: 4 }}>
-        <Box sx={{ background: 'linear-gradient(135deg, #232526 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(33,150,243,0.10)', p: 3, color: '#fff', mb: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 0 24px 4px #43e97b' } }}>
-          <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: '#43e97b' }}>
-            My Completed Health Assessments
-          </Typography>
-          {completed.length === 0 ? (
-            <Typography sx={{ color: '#b0bfcf' }}>
-              No completed assessments yet.<br />
-              Your completed health assessments will appear here as downloadable PDFs after you submit payment.
-            </Typography>
-          ) : (
-            <Box>
-              {completed.map((a, i) => (
-                <Box key={i} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(33,150,243,0.10)', borderRadius: 2, p: 2, mb: 1 }}>
-                  <Box>
-                    <Typography sx={{ color: '#fff', fontWeight: 600 }}>Assessment {i + 1}</Typography>
-                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>Date: {new Date(a.date).toLocaleString()}</Typography>
-                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>BMI: {a.bmi}</Typography>
-                    <Typography sx={{ color: '#b0bfcf', fontSize: 14 }}>Qualifying: {a.qualifying && a.qualifying.length > 0 ? a.qualifying.join(', ') : 'None'}</Typography>
-                  </Box>
-                  <Button variant="outlined" sx={{ color: '#43e97b', borderColor: '#43e97b', fontWeight: 700 }} disabled>Download PDF</Button>
-                </Box>
-              ))}
-            </Box>
-          )}
+    <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', p: 4, color: '#fff', mt: 4 }}>
+      <Typography variant="h5" fontWeight={700} align="center" sx={{ mb: 2, color: '#fff' }}>
+        New Health Assessment
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <TextField label="Height (feet)" name="heightFeet" value={form.heightFeet} onChange={handleChange} fullWidth InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Height (inches)" name="heightInches" value={form.heightInches} onChange={handleChange} fullWidth InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
+          </Grid>
+        </Grid>
+        <TextField label="Weight (lbs)" name="weight" value={form.weight} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
+        <Typography sx={{ mt: 2, mb: 1, color: '#b2f5ea' }}>Diagnoses</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+          {diagnosisOptions.map(opt => (
+            <Button key={opt} variant={form.diagnoses.includes(opt) ? 'contained' : 'outlined'} onClick={e => { e.preventDefault(); handleCheck('diagnoses', opt); }} sx={{ color: '#fff', borderColor: '#fff', background: form.diagnoses.includes(opt) ? 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' : 'none', fontWeight: 600 }}>{opt}</Button>
+          ))}
         </Box>
-        {!showForm && (
-          <Box onClick={() => setShowForm(true)} sx={{ cursor: 'pointer', background: 'linear-gradient(90deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 2px 12px 0 rgba(33,150,243,0.10)', p: 3, color: '#fff', textAlign: 'center', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 0 24px 4px #43e97b' }, fontWeight: 700, fontSize: 20 }}>
-            + Begin New Health Assessment
-          </Box>
-        )}
-      </Box>
-      {showForm && (
-        <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', background: 'linear-gradient(135deg, #2196f3 60%, #43e97b 100%)', borderRadius: 4, boxShadow: '0 8px 40px 0 rgba(33,150,243,0.18)', p: 4, color: '#fff' }}>
-          <Typography variant="h5" fontWeight={700} align="center" sx={{ mb: 2, color: '#fff' }}>
-            Health Assessment
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <Typography sx={{ mb: 1, color: '#b2f5ea' }}>Height & Weight (from profile)</Typography>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={6}>
-                <TextField label="Height (feet)" name="heightFeet" value={form.heightFeet} fullWidth InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField label="Height (inches)" name="heightInches" value={form.heightInches} fullWidth InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
-              </Grid>
-            </Grid>
-            <TextField label="Weight (lbs)" name="weight" value={form.weight} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' }, readOnly: true }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }} />
-            <Typography sx={{ mt: 2, mb: 1, color: '#b2f5ea' }}>Have you been diagnosed with any of the following?</Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              {diagnosisOptions.map(opt => (
-                <Button key={opt} variant={form.diagnoses.includes(opt) ? 'contained' : 'outlined'} onClick={e => { e.preventDefault(); handleCheck('diagnoses', opt); }} sx={{ color: '#fff', borderColor: '#fff', background: form.diagnoses.includes(opt) ? 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' : 'none', fontWeight: 600 }}>{opt}</Button>
-              ))}
-            </Box>
-            <Typography sx={{ mt: 2, mb: 1, color: '#b2f5ea' }}>Do you experience any of the following?</Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              {symptomOptions.map(opt => (
-                <Button key={opt} variant={form.symptoms.includes(opt) ? 'contained' : 'outlined'} onClick={e => { e.preventDefault(); handleCheck('symptoms', opt); }} sx={{ color: '#fff', borderColor: '#fff', background: form.symptoms.includes(opt) ? 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' : 'none', fontWeight: 600 }}>{opt}</Button>
-              ))}
-            </Box>
-            <Typography sx={{ mt: 2, mb: 1, color: '#b2f5ea', fontWeight: 600 }}>
-              How often do you exercise per week?
-            </Typography>
-            <TextField select label="How often do you exercise per week?" name="exercise" value={form.exercise} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }}>
-              {exerciseOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-            </TextField>
-            <Typography sx={{ mt: 3, mb: 1, color: '#b2f5ea', fontWeight: 600 }}>
-              Are you interested in improving your physical or mental health through exercise?
-            </Typography>
-            <TextField select label="Are you interested in improving your physical or mental health through exercise?" name="interest" value={form.interest} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff', whiteSpace: 'normal', lineHeight: 1.2 } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } }, '& label': { whiteSpace: 'normal', lineHeight: 1.2 }, minHeight: 56 }}>
-              <MenuItem value="">Select</MenuItem>
-              <MenuItem value="yes">Yes</MenuItem>
-              <MenuItem value="no">No</MenuItem>
-            </TextField>
-            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} type="submit">Submit Assessment</Button>
-          </form>
+        <Typography sx={{ mt: 2, mb: 1, color: '#b2f5ea' }}>Symptoms</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+          {symptomOptions.map(opt => (
+            <Button key={opt} variant={form.symptoms.includes(opt) ? 'contained' : 'outlined'} onClick={e => { e.preventDefault(); handleCheck('symptoms', opt); }} sx={{ color: '#fff', borderColor: '#fff', background: form.symptoms.includes(opt) ? 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' : 'none', fontWeight: 600 }}>{opt}</Button>
+          ))}
         </Box>
-      )}
+        <TextField select label="How often do you exercise per week?" name="exercise" value={form.exercise} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }}>
+          {exerciseOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+        </TextField>
+        <TextField select label="Are you interested in improving your physical or mental health through exercise?" name="interest" value={form.interest} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff', whiteSpace: 'normal', lineHeight: 1.2 } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } }, '& label': { whiteSpace: 'normal', lineHeight: 1.2 }, minHeight: 56 }}>
+          <MenuItem value="">Select</MenuItem>
+          <MenuItem value="yes">Yes</MenuItem>
+          <MenuItem value="no">No</MenuItem>
+        </TextField>
+        <TextField select label="Preferred Treatment" name="treatment" value={form.treatment} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ style: { color: '#fff' } }} InputProps={{ style: { color: '#fff' } }} sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#fff' } } }}>
+          <MenuItem value="">Select</MenuItem>
+          {treatmentOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+        </TextField>
+        <Button variant="contained" color="primary" fullWidth sx={{ mt: 3, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} type="submit">Submit Assessment</Button>
+      </form>
     </Box>
   );
 }
@@ -332,7 +225,7 @@ export default function Dashboard() {
   if (selected === 'Profile') {
     mainContent = <ProfileSection />;
   } else if (selected === 'My Health Assessments') {
-    mainContent = <HealthAssessment user={user} />;
+    mainContent = <HealthAssessmentCard />;
   } else {
     mainContent = (
       <Box sx={{ width: '100%', maxWidth: 800, mt: 4, p: 4, borderRadius: 4, background: 'rgba(33,150,243,0.10)', color: '#fff', textAlign: 'center' }}>
