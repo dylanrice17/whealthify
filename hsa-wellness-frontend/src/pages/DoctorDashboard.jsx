@@ -7,6 +7,8 @@ const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState(getAllAssessmentsForDoctor());
   const [selected, setSelected] = useState(null);
+  const [signature, setSignature] = useState('');
+  const [signatureApplied, setSignatureApplied] = useState(false);
 
   // Protect route: redirect if not logged in
   useEffect(() => {
@@ -23,16 +25,27 @@ const DoctorDashboard = () => {
   const handleView = (assessment) => setSelected(assessment);
   const handleBack = () => setSelected(null);
   const handleAccept = () => {
-    // Generate LMN
-    const letter = `Letter of Medical Necessity\n\nPatient: ${selected.name}\nDate: ${selected.dateSubmitted}\n\nBased on the health assessment, it is medically necessary for this patient to pursue the following treatment: ${selected.answers.treatment}.\n\nRelevant details:\n- Diagnoses: ${selected.answers.diagnoses?.join(', ') || 'N/A'}\n- Symptoms: ${selected.answers.symptoms?.join(', ') || 'N/A'}\n- Exercise: ${selected.answers.exercise}\n- Interest: ${selected.answers.interest}\n\nThis letter is provided for HSA/FSA reimbursement purposes.\n\nSigned,\nWhealthify Medical Team`;
-    updateAssessment(selected.id, { status: 'Signed', letter });
+    // Generate LMN (unsigned)
+    const letter = `Letter of Medical Necessity\n\nPatient: ${selected.name}\nDate: ${selected.dateSubmitted}\n\nBased on the health assessment, it is medically necessary for this patient to pursue the following treatment: ${selected.answers.treatment}.\n\nRelevant details:\n- Diagnoses: ${selected.answers.diagnoses?.join(', ') || 'N/A'}\n- Symptoms: ${selected.answers.symptoms?.join(', ') || 'N/A'}\n- Exercise: ${selected.answers.exercise}\n- Interest: ${selected.answers.interest}\n\nThis letter is provided for HSA/FSA reimbursement purposes.\n\nSignature: ___________________________`;
+    updateAssessment(selected.id, { status: 'Signed', letter, signature: '' });
     setAssessments(getAllAssessmentsForDoctor());
-    setSelected({ ...selected, status: 'Signed', letter });
+    setSelected({ ...selected, status: 'Signed', letter, signature: '' });
+    setSignature('');
+    setSignatureApplied(false);
   };
   const handleReject = () => {
     updateAssessment(selected.id, { status: 'Rejected' });
     setAssessments(getAllAssessmentsForDoctor());
     setSelected({ ...selected, status: 'Rejected' });
+  };
+  const handleApplySignature = () => {
+    if (!signature) return;
+    // Replace signature line with doctor's signature in cursive font
+    const signedLetter = selected.letter.replace('Signature: ___________________________', 'Signature:');
+    updateAssessment(selected.id, { letter: signedLetter, signature });
+    setAssessments(getAllAssessmentsForDoctor());
+    setSelected({ ...selected, letter: signedLetter, signature });
+    setSignatureApplied(true);
   };
 
   return (
@@ -73,6 +86,26 @@ const DoctorDashboard = () => {
               <Box sx={{ mt: 3, p: 2, background: 'rgba(67,233,123,0.10)', borderRadius: 2 }}>
                 <Typography variant="h6" fontWeight={700} sx={{ color: '#43e97b' }}>Letter of Medical Necessity</Typography>
                 <Typography sx={{ whiteSpace: 'pre-line', mt: 1 }}>{selected.letter}</Typography>
+                {(!selected.signature || !signatureApplied) && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography sx={{ mb: 1 }}>Type your name to sign:</Typography>
+                    <input
+                      type="text"
+                      value={signature}
+                      onChange={e => setSignature(e.target.value)}
+                      style={{ padding: '8px', borderRadius: '4px', border: '1px solid #43e97b', width: '100%', marginBottom: '8px' }}
+                      placeholder="Doctor's Name"
+                    />
+                    <Button variant="contained" color="success" onClick={handleApplySignature} disabled={!signature}>
+                      Apply Signature
+                    </Button>
+                  </Box>
+                )}
+                {selected.signature && signatureApplied && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography sx={{ fontFamily: 'Pacifico, cursive', fontSize: 28, fontWeight: 400 }}>{selected.signature}</Typography>
+                  </Box>
+                )}
               </Box>
             )}
             <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
