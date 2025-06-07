@@ -147,7 +147,7 @@ export default function Home() {
             <ParallaxStepCard
               icon={<CheckCircleIcon fontSize="inherit" />}
               title="Step 2: Doctor Letter"
-              description="Instantly generate a medical necessity letter for your gym membership."
+              description="Receive a letter of medical necessity from a doctor within 24 hours."
               gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
             />
           </Grid>
