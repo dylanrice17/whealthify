@@ -98,17 +98,39 @@ const testimonials = [
 export default function Home() {
   const navigate = useNavigate();
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.2) 0%, #1e293b 50%, #0f172a 100%)', py: 8 }}>
-      <Box sx={gradientBox}>
-        <Typography variant="h3" fontWeight={700} gutterBottom>
-          Healthy Living, Tax Free
-        </Typography>
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          Unlock your health potential and save money. Use your HSA/FSA funds to pay for your gym membership with a doctor-approved medical necessity letter.
-        </Typography>
-        <Button variant="contained" size="large" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)', color: '#fff', fontWeight: 700 }} onClick={() => navigate('/login')}>
-          Get Started
-        </Button>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #43e97b 100%)', py: 8 }}>
+      {/* Hero Section with Video Background */}
+      <Box sx={{ position: 'relative', height: '80vh', overflow: 'hidden', mb: 8 }}>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src="/videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)', zIndex: 1 }} />
+        <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: '#fff', px: 4 }}>
+          <Typography variant="h2" fontWeight={900} gutterBottom>
+            Healthy Living, Tax Free
+          </Typography>
+          <Typography variant="h5" sx={{ mb: 4, maxWidth: 800 }}>
+            Unlock your health potential and save money. Use your HSA/FSA funds to pay for your gym membership with a doctor-approved medical necessity letter.
+          </Typography>
+          <Button variant="contained" size="large" sx={{ background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)', color: '#fff', fontWeight: 700, fontSize: 20, px: 5, py: 1.5, boxShadow: '0 2px 12px 0 rgba(67,233,123,0.10)' }} href="/login">
+            Get Started
+          </Button>
+        </Box>
       </Box>
 
       <Box sx={{ mt: 8 }}>
