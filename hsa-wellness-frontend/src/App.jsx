@@ -9,6 +9,7 @@ import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import DoctorLogin from './pages/DoctorLogin';
 import DoctorDashboard from './pages/DoctorDashboard';
+import Enterprise from './pages/Enterprise';
 import { AuthProvider } from './components/AuthContext';
 
 const theme = createTheme({
@@ -38,6 +39,7 @@ function AppRoutes() {
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/doctor-login" element={<DoctorLogin />} />
       <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+      <Route path="/enterprise" element={<Enterprise />} />
     </Routes>
   );
 }
