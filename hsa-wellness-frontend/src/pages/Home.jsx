@@ -97,35 +97,11 @@ const testimonials = [
 
 export default function Home() {
   const navigate = useNavigate();
-  const [videoSrc, setVideoSrc] = useState('/videos/3125907-uhd_3840_2160_25fps.mp4');
-  const healthCardRef = useRef(null);
-
-  useEffect(() => {
-    function handleScroll() {
-      if (!healthCardRef.current) return;
-      const rect = healthCardRef.current.getBoundingClientRect();
-      if (rect.top <= 0) {
-        setVideoSrc('/videos/yoga.mp4');
-        console.log('Switched to yoga.mp4');
-      } else {
-        setVideoSrc('/videos/3125907-uhd_3840_2160_25fps.mp4');
-        console.log('Switched to 3125907-uhd_3840_2160_25fps.mp4');
-      }
-    }
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, []);
 
   return (
     <>
       {/* Fixed background video for the whole page */}
       <video
-        key={videoSrc}
         autoPlay
         loop
         muted
@@ -142,7 +118,7 @@ export default function Home() {
           transition: 'opacity 0.5s',
         }}
       >
-        <source src={videoSrc} type="video/mp4" />
+        <source src="/videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       {/* Overlay for darkening the video */}
@@ -163,7 +139,7 @@ export default function Home() {
 
         <Box sx={{ mt: 8 }}>
           <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
-            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center" ref={healthCardRef}>
+            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center">
               <ParallaxStepCard
                 icon={<FitnessCenterIcon fontSize="inherit" />}
                 title="Step 1: Health Assessment"
