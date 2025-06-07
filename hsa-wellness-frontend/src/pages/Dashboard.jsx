@@ -361,6 +361,20 @@ function UserAssessmentsSection({ user }) {
             <Typography>Date: {a.dateSubmitted}</Typography>
             <Typography>Status: {a.status}</Typography>
             <Button variant="contained" sx={{ mt: 1, fontWeight: 700, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }} onClick={() => setSelectedAssessment(a)}>View</Button>
+            {a.status === 'Signed' && a.pdf && (
+              <Button
+                variant="outlined"
+                sx={{ mt: 1, ml: 2, color: '#43e97b', borderColor: '#43e97b' }}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = a.pdf;
+                  link.download = `LMN-${a.name.replace(/\s+/g, '_')}.pdf`;
+                  link.click();
+                }}
+              >
+                Download PDF
+              </Button>
+            )}
           </Box>
         ))
       )}

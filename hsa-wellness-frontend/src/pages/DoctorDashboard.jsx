@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Drawer, List, ListItem, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { getAllAssessmentsForDoctor, updateAssessment } from '../services/AssessmentService';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -38,15 +39,79 @@ const DoctorDashboard = () => {
     setAssessments(getAllAssessmentsForDoctor());
     setSelected({ ...selected, status: 'Rejected' });
   };
-  const handleApplySignature = () => {
+  const handleApplySignature = async () => {
     if (!signature) return;
-    // Replace signature line with doctor's signature in cursive font
-    const signedLetter = selected.letter.replace('Signature: ___________________________', 'Signature:');
-    updateAssessment(selected.id, { letter: signedLetter, signature });
+    // Header info
+    const doctorName = signature;
+    const credentials = 'MD';
+    const company = 'Whealthify';
+    const address = '100 Harbor Blvd\nWeehawken, NJ 07086';
+    const today = new Date().toISOString().split('T')[0];
+    // Patient info
+    const patientName = selected.name;
+    const diagnosis = selected.answers.diagnoses && selected.answers.diagnoses.length > 0 ? selected.answers.diagnoses.join(', ') : 'N/A';
+    // Letter body
+    const letterText = `To Whom It May Concern,\n\nI am writing on behalf of my patient, ${patientName}, who is under my medical care for the treatment of ${diagnosis}.\n\nAs part of their comprehensive treatment plan, I am prescribing a structured physical activity program to be conducted at a fitness facility. A gym membership is medically necessary for ${patientName} in order to support clinically recommended lifestyle changes, which include regular cardiovascular and strength-based exercise. These activities are essential to help reduce weight, improve metabolic health, and lower the risk of associated conditions such as hypertension, diabetes, and heart disease.\n\nThis recommendation is made solely for medical reasons, not for general wellness or cosmetic purposes. I recommend that ${patientName} maintain a gym membership for an initial period of 12 months, with continued participation to be reassessed based on clinical progress and future health evaluations.\n\nIf you require any further information regarding this recommendation, please do not hesitate to contact me.`;
+
+    // Generate PDF with pdf-lib
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4 size
+    const { width } = page.getSize();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontSize = 13;
+    let y = 800;
+    const maxWidth = 495; // 595 - 2*50 margin
+    // Header
+    page.drawText(`${doctorName} ${credentials}`, { x: 50, y, size: 15, font, color: rgb(0, 0, 0) });
+    y -= 22;
+    page.drawText(company, { x: 50, y, size: 13, font, color: rgb(0, 0, 0) });
+    y -= 18;
+    address.split('\n').forEach(line => { page.drawText(line, { x: 50, y, size: 13, font, color: rgb(0, 0, 0) }); y -= 18; });
+    y -= 10;
+    page.drawText(`Date: ${today}`, { x: 50, y, size: 13, font, color: rgb(0, 0, 0) });
+    y -= 30;
+    // Body (word wrap)
+    const lines = letterText.split('\n');
+    lines.forEach(line => {
+      const wrapped = wrapText(line, font, fontSize, maxWidth);
+      wrapped.forEach(wline => {
+        page.drawText(wline, { x: 50, y, size: fontSize, font, color: rgb(0, 0, 0) });
+        y -= 22;
+      });
+      y -= 6;
+    });
+    // Signature label
+    y -= 30;
+    page.drawText('Signature:', { x: 50, y, size: fontSize, font, color: rgb(0, 0, 0) });
+    y -= 32;
+    page.drawText(signature, { x: 120, y, size: 28, font, color: rgb(0, 0, 0), italic: true });
+    // Save PDF as data URL
+    const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
+    // Update assessment with PDF
+    updateAssessment(selected.id, { letter: letterText, signature, pdf: pdfBytes });
     setAssessments(getAllAssessmentsForDoctor());
-    setSelected({ ...selected, letter: signedLetter, signature });
+    setSelected({ ...selected, letter: letterText, signature, pdf: pdfBytes });
     setSignatureApplied(true);
   };
+
+  // Helper: word wrap for pdf-lib
+  function wrapText(text, font, fontSize, maxWidth) {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = '';
+    for (let word of words) {
+      const testLine = currentLine ? currentLine + ' ' + word : word;
+      const width = font.widthOfTextAtSize(testLine, fontSize);
+      if (width > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: '#19202b' }}>
