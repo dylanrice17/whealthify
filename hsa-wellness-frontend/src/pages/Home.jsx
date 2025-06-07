@@ -105,9 +105,11 @@ export default function Home() {
       if (!healthCardRef.current) return;
       const rect = healthCardRef.current.getBoundingClientRect();
       if (rect.top <= 0) {
-        setVideoSrc('/videos/7521693-hd_1920_1080_25fps.mp4');
+        setVideoSrc('/videos/yoga.mp4');
+        console.log('Switched to yoga.mp4');
       } else {
         setVideoSrc('/videos/3125907-uhd_3840_2160_25fps.mp4');
+        console.log('Switched to 3125907-uhd_3840_2160_25fps.mp4');
       }
     }
     handleScroll();
