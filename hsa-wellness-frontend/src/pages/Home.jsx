@@ -97,30 +97,57 @@ const testimonials = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const [videoSrc, setVideoSrc] = useState('/videos/3125907-uhd_3840_2160_25fps.mp4');
+  const healthCardRef = useRef(null);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (!healthCardRef.current) return;
+      const rect = healthCardRef.current.getBoundingClientRect();
+      if (rect.top <= 0) {
+        setVideoSrc('/videos/7521693-hd_1920_1080_25fps.mp4');
+      } else {
+        setVideoSrc('/videos/3125907-uhd_3840_2160_25fps.mp4');
+      }
+    }
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #43e97b 100%)', py: 8 }}>
-      {/* Hero Section with Video Background */}
-      <Box sx={{ position: 'relative', height: '80vh', overflow: 'hidden', mb: 8 }}>
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 0,
-          }}
-        >
-          <source src="/videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)', zIndex: 1 }} />
-        <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: '#fff', px: 4 }}>
+    <>
+      {/* Fixed background video for the whole page */}
+      <video
+        key={videoSrc}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'cover',
+          zIndex: 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.5s',
+        }}
+      >
+        <source src={videoSrc} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      {/* Overlay for darkening the video */}
+      <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)', zIndex: 1, pointerEvents: 'none' }} />
+      <Box sx={{ position: 'relative', zIndex: 2, minHeight: '100vh', py: 8 }}>
+        {/* Hero Section */}
+        <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: '#fff', px: 4, mb: 8 }}>
           <Typography variant="h2" fontWeight={900} gutterBottom>
             Healthy Living, Tax Free
           </Typography>
@@ -131,75 +158,75 @@ export default function Home() {
             Get Started
           </Button>
         </Box>
-      </Box>
 
-      <Box sx={{ mt: 8 }}>
-        <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
-          <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center">
-            <ParallaxStepCard
-              icon={<FitnessCenterIcon fontSize="inherit" />}
-              title="Step 1: Health Assessment"
-              description="Complete a quick, secure health assessment to get started."
-              gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
-            />
+        <Box sx={{ mt: 8 }}>
+          <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
+            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center" ref={healthCardRef}>
+              <ParallaxStepCard
+                icon={<FitnessCenterIcon fontSize="inherit" />}
+                title="Step 1: Health Assessment"
+                description="Complete a quick, secure health assessment to get started."
+                gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center">
+              <ParallaxStepCard
+                icon={<CheckCircleIcon fontSize="inherit" />}
+                title="Step 2: Doctor Letter"
+                description="Receive a letter of medical necessity from a doctor within 24 hours."
+                gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center">
+              <ParallaxStepCard
+                icon={<CreditCardIcon fontSize="inherit" />}
+                title="Step 3: Use HSA/FSA"
+                description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
+                gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center">
-            <ParallaxStepCard
-              icon={<CheckCircleIcon fontSize="inherit" />}
-              title="Step 2: Doctor Letter"
-              description="Receive a letter of medical necessity from a doctor within 24 hours."
-              gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center">
-            <ParallaxStepCard
-              icon={<CreditCardIcon fontSize="inherit" />}
-              title="Step 3: Use HSA/FSA"
-              description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
-              gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
-            />
-          </Grid>
-        </Grid>
-      </Box>
+        </Box>
 
-      <Divider sx={{ my: 6, background: 'rgba(255,255,255,0.08)' }} />
+        <Divider sx={{ my: 6, background: 'rgba(255,255,255,0.08)' }} />
 
-      <Box sx={{ maxWidth: 900, mx: 'auto', textAlign: 'center', mb: 6 }}>
-        <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#fff', mb: 1 }}>
-          Why choose us?
+        <Box sx={{ maxWidth: 900, mx: 'auto', textAlign: 'center', mb: 6 }}>
+          <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#fff', mb: 1 }}>
+            Why choose us?
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+            Fast, secure, and designed for your health and financial freedom. No more paperwork, no more hassle—just healthy living, tax free.
+          </Typography>
+        </Box>
+
+        <Typography variant="h4" fontWeight={700} align="center" sx={{ color: '#fff', mb: 4 }}>
+          What Our Users Say
         </Typography>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-          Fast, secure, and designed for your health and financial freedom. No more paperwork, no more hassle—just healthy living, tax free.
-        </Typography>
-      </Box>
+        <Box sx={{ maxWidth: 600, mx: 'auto', display: 'flex', flexDirection: 'column', gap: 4, mb: 6 }}>
+          {testimonials.map((t, i) => (
+            <Card key={i} sx={{ background: t.bg, borderRadius: '20px', boxShadow: '0 2px 16px 0 rgba(33,150,243,0.10)', px: 3, py: 2 }}>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Avatar src={t.avatar} alt={t.name} sx={{ width: 64, height: 64, mb: 1.5 }} />
+                <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', mb: 1 }}>{t.name}</Typography>
+                <Typography variant="body1" sx={{ color: '#fff', fontStyle: 'italic' }}>{t.text}</Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
 
-      <Typography variant="h4" fontWeight={700} align="center" sx={{ color: '#fff', mb: 4 }}>
-        What Our Users Say
-      </Typography>
-      <Box sx={{ maxWidth: 600, mx: 'auto', display: 'flex', flexDirection: 'column', gap: 4, mb: 6 }}>
-        {testimonials.map((t, i) => (
-          <Card key={i} sx={{ background: t.bg, borderRadius: '20px', boxShadow: '0 2px 16px 0 rgba(33,150,243,0.10)', px: 3, py: 2 }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Avatar src={t.avatar} alt={t.name} sx={{ width: 64, height: 64, mb: 1.5 }} />
-              <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', mb: 1 }}>{t.name}</Typography>
-              <Typography variant="body1" sx={{ color: '#fff', fontStyle: 'italic' }}>{t.text}</Typography>
-            </CardContent>
+        {/* Notice Box */}
+        <Box sx={{ maxWidth: 600, mx: 'auto', mb: 2 }}>
+          <Card sx={{ background: 'rgba(30,41,59,0.95)', borderLeft: '6px solid #ff9800', borderRadius: '16px', boxShadow: '0 2px 16px 0 rgba(255,168,0,0.10)', px: 3, py: 2, display: 'flex', alignItems: 'center' }}>
+            <WarningAmberIcon sx={{ color: '#ff9800', fontSize: 32, mr: 2 }} />
+            <Box>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#fff', display: 'inline' }}>Notice: </Typography>
+              <Typography variant="body2" sx={{ color: '#fff', display: 'inline' }}>
+                This application is in development and not yet HIPAA compliant. Do not enter real patient information.
+              </Typography>
+            </Box>
           </Card>
-        ))}
+        </Box>
       </Box>
-
-      {/* Notice Box */}
-      <Box sx={{ maxWidth: 600, mx: 'auto', mb: 2 }}>
-        <Card sx={{ background: 'rgba(30,41,59,0.95)', borderLeft: '6px solid #ff9800', borderRadius: '16px', boxShadow: '0 2px 16px 0 rgba(255,168,0,0.10)', px: 3, py: 2, display: 'flex', alignItems: 'center' }}>
-          <WarningAmberIcon sx={{ color: '#ff9800', fontSize: 32, mr: 2 }} />
-          <Box>
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#fff', display: 'inline' }}>Notice: </Typography>
-            <Typography variant="body2" sx={{ color: '#fff', display: 'inline' }}>
-              This application is in development and not yet HIPAA compliant. Do not enter real patient information.
-            </Typography>
-          </Box>
-        </Card>
-      </Box>
-    </Box>
+    </>
   );
 } 
