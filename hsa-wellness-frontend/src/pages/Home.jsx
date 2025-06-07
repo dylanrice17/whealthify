@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Button, Typography, Card, CardContent, Avatar, Divider, Alert } from '@mui/material';
+import { Box, Button, Typography, Card, CardContent, Avatar, Divider, Alert, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -98,7 +98,7 @@ const testimonials = [
 export default function Home() {
   const navigate = useNavigate();
   return (
-    <Box sx={{ minHeight: '100vh', background: 'radial-gradient(circle at 50% 0%, #1e293b 60%, #0f172a 100%)', py: 8 }}>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.2) 0%, #1e293b 50%, #0f172a 100%)', py: 8 }}>
       <Box sx={gradientBox}>
         <Typography variant="h3" fontWeight={700} gutterBottom>
           Healthy Living, Tax Free
@@ -112,24 +112,32 @@ export default function Home() {
       </Box>
 
       <Box sx={{ mt: 8 }}>
-        <ParallaxStepCard
-          icon={<FitnessCenterIcon fontSize="inherit" />}
-          title="Step 1: Health Assessment"
-          description="Complete a quick, secure health assessment to get started."
-          gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
-        />
-        <ParallaxStepCard
-          icon={<CheckCircleIcon fontSize="inherit" />}
-          title="Step 2: Doctor Letter"
-          description="Instantly generate a medical necessity letter for your gym membership."
-          gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
-        />
-        <ParallaxStepCard
-          icon={<CreditCardIcon fontSize="inherit" />}
-          title="Step 3: Use HSA/FSA"
-          description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
-          gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
-        />
+        <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
+          <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center">
+            <ParallaxStepCard
+              icon={<FitnessCenterIcon fontSize="inherit" />}
+              title="Step 1: Health Assessment"
+              description="Complete a quick, secure health assessment to get started."
+              gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center">
+            <ParallaxStepCard
+              icon={<CheckCircleIcon fontSize="inherit" />}
+              title="Step 2: Doctor Letter"
+              description="Instantly generate a medical necessity letter for your gym membership."
+              gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center">
+            <ParallaxStepCard
+              icon={<CreditCardIcon fontSize="inherit" />}
+              title="Step 3: Use HSA/FSA"
+              description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
+              gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
+            />
+          </Grid>
+        </Grid>
       </Box>
 
       <Divider sx={{ my: 6, background: 'rgba(255,255,255,0.08)' }} />

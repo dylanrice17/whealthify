@@ -51,7 +51,7 @@ export default function Enterprise() {
     setForm({ name: '', email: '', company: '' });
   };
   return (
-    <Box sx={{ minHeight: '100vh', background: 'radial-gradient(circle at 60% 0%, #2196f3 60%, #43e97b 100%)', pb: 10 }}>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #43e97b 100%)', py: 8 }}>
       {/* Hero Section */}
       <Box sx={{ pt: 10, pb: 8, textAlign: 'center', color: '#fff', position: 'relative' }}>
         <Typography variant="h2" fontWeight={900} sx={{ mb: 2, letterSpacing: 1, textShadow: '0 8px 40px #2196f3' }}>
