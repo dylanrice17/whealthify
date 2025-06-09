@@ -118,7 +118,7 @@ export default function Home() {
           transition: 'opacity 0.5s',
         }}
       >
-        <source src="/videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
+        <source src="https://storage.googleapis.com/whealthify_videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       {/* Overlay for darkening the video */}
