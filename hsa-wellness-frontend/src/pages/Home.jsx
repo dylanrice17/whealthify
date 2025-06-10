@@ -18,7 +18,7 @@ const gradientBox = {
   textAlign: 'center',
 };
 
-function ParallaxStepCard({ icon, title, description, gradient }) {
+function ParallaxStepCard({ icon, title, description, gradient, small }) {
   const ref = useRef();
   const [scale, setScale] = useState(1);
   const [hovered, setHovered] = useState(false);
@@ -52,23 +52,25 @@ function ParallaxStepCard({ icon, title, description, gradient }) {
       onMouseLeave={() => setHovered(false)}
       sx={{
         background: gradient,
-        borderRadius: '24px',
+        borderRadius: '20px',
         boxShadow: hovered
-          ? '0 0 32px 8px rgba(67,233,123,0.25), 0 8px 40px 0 rgba(33,150,243,0.18)'
-          : '0 8px 40px 0 rgba(33,150,243,0.18)',
+          ? '0 0 24px 4px rgba(67,233,123,0.18), 0 4px 20px 0 rgba(33,150,243,0.12)'
+          : '0 4px 20px 0 rgba(33,150,243,0.12)',
         color: '#fff',
-        mb: 4,
-        maxWidth: 700,
+        mb: 2,
+        maxWidth: small ? 260 : 700,
+        minWidth: small ? 200 : undefined,
         mx: 'auto',
         transform: `scale(${scale})`,
         transition: 'transform 0.35s cubic-bezier(.23,1.01,.32,1), box-shadow 0.4s',
         cursor: 'pointer',
+        p: small ? 1 : 2,
       }}
     >
-      <CardContent>
-        <Box sx={{ fontSize: 48, mb: 1 }}>{icon}</Box>
-        <Typography variant="h5" fontWeight={700} gutterBottom>{title}</Typography>
-        <Typography variant="body1">{description}</Typography>
+      <CardContent sx={{ p: small ? 1 : 2 }}>
+        <Box sx={{ fontSize: small ? 32 : 48, mb: 1 }}>{icon}</Box>
+        <Typography variant={small ? 'subtitle1' : 'h5'} fontWeight={700} gutterBottom>{title}</Typography>
+        <Typography variant={small ? 'body2' : 'body1'}>{description}</Typography>
       </CardContent>
     </Card>
   );
@@ -110,17 +112,18 @@ export default function Home() {
 
   useEffect(() => {
     function handleScroll() {
-      if (!step1Ref.current || !step2Ref.current || !step3Ref.current) return;
-      const refs = [step1Ref, step2Ref, step3Ref];
-      const windowCenter = window.innerHeight / 2;
-      // Find which card's center is closest to the window center
-      const distances = refs.map(ref => {
-        const rect = ref.current.getBoundingClientRect();
-        const cardCenter = rect.top + rect.height / 2;
-        return Math.abs(cardCenter - windowCenter);
-      });
-      const minIndex = distances.indexOf(Math.min(...distances));
-      setVideoSrc(videoUrls[minIndex]);
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollProgress = docHeight > 0 ? scrollTop / docHeight : 0;
+      let videoIndex = 0;
+      if (scrollProgress < 1 / 3) {
+        videoIndex = 0;
+      } else if (scrollProgress < 2 / 3) {
+        videoIndex = 1;
+      } else {
+        videoIndex = 2;
+      }
+      setVideoSrc(videoUrls[videoIndex]);
     }
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
@@ -159,7 +162,7 @@ export default function Home() {
       <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)', zIndex: 1, pointerEvents: 'none' }} />
       <Box sx={{ position: 'relative', zIndex: 2, minHeight: '100vh', py: 8 }}>
         {/* Hero Section */}
-        <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: '#fff', px: 4, mb: 8 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: '#fff', px: 4, mb: 6 }}>
           <Typography variant="h2" fontWeight={900} gutterBottom>
             Healthy Living, Tax Free
           </Typography>
@@ -171,30 +174,33 @@ export default function Home() {
           </Button>
         </Box>
 
-        <Box sx={{ mt: 8 }}>
-          <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
-            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center" ref={step1Ref}>
+        <Box sx={{ mt: 0 }}>
+          <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Grid item xs={12} sm={4} md={4} key="step1" display="flex" justifyContent="center" ref={step1Ref} sx={{ mx: 1 }}>
               <ParallaxStepCard
                 icon={<FitnessCenterIcon fontSize="inherit" />}
                 title="Step 1: Health Assessment"
                 description="Complete a quick, secure health assessment to get started."
                 gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
+                small
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center" ref={step2Ref}>
+            <Grid item xs={12} sm={4} md={4} key="step2" display="flex" justifyContent="center" ref={step2Ref} sx={{ mx: 1 }}>
               <ParallaxStepCard
                 icon={<CheckCircleIcon fontSize="inherit" />}
                 title="Step 2: Doctor Letter"
                 description="Receive a letter of medical necessity from a doctor within 24 hours."
                 gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
+                small
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center" ref={step3Ref}>
+            <Grid item xs={12} sm={4} md={4} key="step3" display="flex" justifyContent="center" ref={step3Ref} sx={{ mx: 1 }}>
               <ParallaxStepCard
                 icon={<CreditCardIcon fontSize="inherit" />}
                 title="Step 3: Use HSA/FSA"
                 description="Submit your letter to your gym or insurance and pay with your HSA/FSA card."
                 gradient="linear-gradient(135deg, #2196f3 60%, #43e97b 100%)"
+                small
               />
             </Grid>
           </Grid>
