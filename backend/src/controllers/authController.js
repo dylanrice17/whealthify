@@ -46,7 +46,12 @@ exports.signup = async (req, res) => {
     await user.save();
 
     // Send verification email
-    const verificationUrl = `${req.protocol}://${req.get('host')}/api/auth/verify/${verificationToken}`;
+    let verificationUrl;
+    if (process.env.NODE_ENV === 'production') {
+      verificationUrl = `https://whealthify.vercel.app/api/auth/verify/${verificationToken}`;
+    } else {
+      verificationUrl = `${req.protocol}://${req.get('host')}/api/auth/verify/${verificationToken}`;
+    }
     const msg = {
       to: email,
       from: config.emailFrom,
