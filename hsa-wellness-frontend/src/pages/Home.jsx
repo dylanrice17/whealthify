@@ -98,10 +98,44 @@ const testimonials = [
 export default function Home() {
   const navigate = useNavigate();
 
+  const videoUrls = [
+    "https://storage.googleapis.com/whealthify_videos/3125907-uhd_3840_2160_25fps.mp4",
+    "https://storage.googleapis.com/whealthify_videos/4325585-uhd_4096_2160_25fps.mp4",
+    "https://storage.googleapis.com/whealthify_videos/7521693-hd_1920_1080_25fps.mp4"
+  ];
+  const [videoSrc, setVideoSrc] = useState(videoUrls[0]);
+  const step1Ref = useRef(null);
+  const step2Ref = useRef(null);
+  const step3Ref = useRef(null);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (!step1Ref.current || !step2Ref.current || !step3Ref.current) return;
+      const refs = [step1Ref, step2Ref, step3Ref];
+      const windowCenter = window.innerHeight / 2;
+      // Find which card's center is closest to the window center
+      const distances = refs.map(ref => {
+        const rect = ref.current.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        return Math.abs(cardCenter - windowCenter);
+      });
+      const minIndex = distances.indexOf(Math.min(...distances));
+      setVideoSrc(videoUrls[minIndex]);
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
   return (
     <>
       {/* Fixed background video for the whole page */}
       <video
+        key={videoSrc}
         autoPlay
         loop
         muted
@@ -118,7 +152,7 @@ export default function Home() {
           transition: 'opacity 0.5s',
         }}
       >
-        <source src="https://storage.googleapis.com/whealthify_videos/3125907-uhd_3840_2160_25fps.mp4" type="video/mp4" />
+        <source src={videoSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       {/* Overlay for darkening the video */}
@@ -139,7 +173,7 @@ export default function Home() {
 
         <Box sx={{ mt: 8 }}>
           <Grid container spacing={4} sx={{ maxWidth: 900, mx: 'auto', mb: 8, justifyContent: 'center' }}>
-            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center">
+            <Grid item xs={12} sm={6} md={6} key="step1" display="flex" justifyContent="center" ref={step1Ref}>
               <ParallaxStepCard
                 icon={<FitnessCenterIcon fontSize="inherit" />}
                 title="Step 1: Health Assessment"
@@ -147,7 +181,7 @@ export default function Home() {
                 gradient="linear-gradient(135deg, #2196f3 60%, #38f9d7 100%)"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center">
+            <Grid item xs={12} sm={6} md={6} key="step2" display="flex" justifyContent="center" ref={step2Ref}>
               <ParallaxStepCard
                 icon={<CheckCircleIcon fontSize="inherit" />}
                 title="Step 2: Doctor Letter"
@@ -155,7 +189,7 @@ export default function Home() {
                 gradient="linear-gradient(135deg, #43e97b 60%, #38f9d7 100%)"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center">
+            <Grid item xs={12} sm={6} md={6} key="step3" display="flex" justifyContent="center" ref={step3Ref}>
               <ParallaxStepCard
                 icon={<CreditCardIcon fontSize="inherit" />}
                 title="Step 3: Use HSA/FSA"
